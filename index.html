@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>AkayGPT</title>
+</head>
+<body>
+<h2>AkayGPT</h2>
+
+<textarea id="q" placeholder="Bir şey yaz" rows="4"></textarea><br>
+<button onclick="gonder()">Gönder</button>
+
+<pre id="c"></pre>
+
+<script>
+async function gonder(){
+  c.innerText="Yazıyor...";
+  try{
+    const r = await fetch(
+      "https://api-inference.huggingface.co/models/google/gemma-2-2b-it",
+      {
+        method:"POST",
+        headers:{
+          "Authorization":"Bearer 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",
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({inputs:q.value})
+      }
+    );
+    const d = await r.json();
+    c.innerText = d[0]?.generated_text || "Cevap yok";
+  }catch(e){
+    c.innerText="Bağlantı hatası";
+  }
+}
+</script>
+</body>
+</html>
