@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AkayGPT</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+header {
+  background: #1e1e1e;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+}
+#chat {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+.msg {
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+.user {
+  background: #2563eb;
+  align-self: flex-end;
+}
+.bot {
+  background: #333;
+}
+footer {
+  display: flex;
+  padding: 8px;
+  background: #1e1e1e;
+}
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+}
+button {
+  margin-left: 8px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #22c55e;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<header>AkayGPT</header>
+
+<div id="chat"></div>
+
+<footer>
+  <input id="text" placeholder="Bir şey yaz..." />
+  <button onclick="send()">Gönder</button>
+</footer>
+
+<script>
+const chat = document.getElementById("chat");
+
+function addMsg(text, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function send() {
+  const input = document.getElementById("text");
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMsg(text, "user");
+  input.value = "";
+  addMsg("Yazıyor...", "bot");
+
+  try {
+    const res = await fetch(
+      "https://akaygpt-proxy2.hakay8481.workers.dev/",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: text })
+      }
+    );
+
+    const data = await res.json();
+    chat.lastChild.remove();
+    addMsg(data.reply || "Cevap alınamadı", "bot");
+
+  } catch (e) {
+    chat.lastChild.remove();
+    addMsg("Bağlantı hatası", "bot");
+  }
+}
+</script>
+
+</body>
+  </html>
